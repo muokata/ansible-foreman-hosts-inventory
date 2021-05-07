@@ -162,9 +162,9 @@ class AnsibleInventory(object):
                         hosts.write(f'\n[{key}]\n')
                         for val in results_dict[key]:
                             hosts.write(f'{val}\n')
-                print(f'Check the generated inventory file: {self.hfile}')
+                print(f'The following inventory file has been generated: {self.hfile}')
             except IOError:
-                print(f'Error opening the target file: {self.hfile}')
+                print(f'Error opening the target file: {self.hfile}, please check.')
 
         # catch possible requests exceptions
         except requests.exceptions.HTTPError as errh:
