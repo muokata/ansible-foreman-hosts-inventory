@@ -6,6 +6,8 @@ import modules.frmn_envparser as fe
 import modules.frmn_confparser as fc
 
 
+# TODO: update README.md with the config sections in config/foreman.ini
+
 def generate_ansible_hosts():
     """
     Parse the Foreman API: list all environments, generate Ansible
