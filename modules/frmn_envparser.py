@@ -14,7 +14,7 @@ Fore more detailed information check the README.md file.
 # TODO: log errors instead of printing (logging module)
 
 __author__ = 'Petyo Kunchev'
-__version__ = '2.0.1'
+__version__ = '2.0.3'
 __maintainer__ = 'Petyo Kunchev'
 __license__ = 'MIT'
 
@@ -174,7 +174,7 @@ class AnsibleInventory(object):
                 print(f'Error opening the target file: {self.hfile}, please '
                       f'check.')
 
-                # catch possible requests exceptions
+        # catch possible requests exceptions
         except requests.exceptions.HTTPError as errh:
             print(f'HTTP error: {errh}')
         except requests.exceptions.ConnectionError as errc:

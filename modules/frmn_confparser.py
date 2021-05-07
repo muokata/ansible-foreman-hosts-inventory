@@ -25,10 +25,10 @@ Fore more detailed information please check the README.md file.
 """
 
 # TODO: implement color prints (colorama module)
-# TODO: log errors instead of printing (logging module)
+# TODO: log errors in logfile (logging module)
 
 __author__ = 'Petyo Kunchev'
-__version__ = '2.0.2'
+__version__ = '2.0.3'
 __maintainer__ = 'Petyo Kunchev'
 __license__ = 'MIT'
 
