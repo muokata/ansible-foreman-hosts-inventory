@@ -56,7 +56,7 @@ def print_os_warning():
     if os_family not in supported_platforms:
         print(f'Running {os_family.upper()} OS, make sure to transfer the '
               f'generated '
-              f'inventory file to a system which supports Ansible!')
+              f'inventory file to a system which supports Ansible.')
 
 
 def read_settings() -> dict:

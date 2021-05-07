@@ -18,6 +18,7 @@ __version__ = '2.0.1'
 __maintainer__ = 'Petyo Kunchev'
 __license__ = 'MIT'
 
+import os
 from pathlib import Path
 from typing import Any
 from datetime import datetime
@@ -49,11 +50,12 @@ class AnsibleInventory(object):
         Parse the Foreman API per env and generate Ansible hosts file
     """
 
-    def __init__(self, base_url, username, password, hostfile):
+    def __init__(self, envid, base_url, username, password, hostfile):
         """
         Inits the AnsibleInventory class.
 
         Args:
+            envid: The Foreman environment ID parsed from args
             base_url: The base Foreman API URL
             username: The API username
             password: The password for the API user
@@ -62,7 +64,8 @@ class AnsibleInventory(object):
         self.base_url: str = base_url
         self.username: str = username
         self.password: str = password
-        self.hfile: str = str(Path.home()) + '/' + hostfile
+        self.envid: str = envid
+        self.hfile: str = str(Path.home()) + os.path.sep + hostfile + envid
 
     def parse_envs(self):
         """
@@ -117,7 +120,9 @@ class AnsibleInventory(object):
         generates Ansible hosts file, based on the obtained from Foreman
         data, containing host groups and adjacent hosts.
 
-        :type environment_id: Foreman environment ID provided as arg
+        Parameters
+        ----------
+        environment_id (str): Foreman environment ID provided as arg
         """
         # construct the Foreman API URL for the selected environment -
         # results are limited up to 100000, change accordingly
@@ -128,7 +133,7 @@ class AnsibleInventory(object):
         now: datetime = datetime.now()
         fdate: str = now.strftime('%d/%m/%Y %H:%M:%S')
 
-        print(f'Parsing Foreman environment with id: {environment_id}')
+        print(f'Parsing Foreman environment with id: [{environment_id}]')
 
         # API parse related - Foreman hosts, timeout is set to 5
         try:
@@ -157,16 +162,19 @@ class AnsibleInventory(object):
             # write the results to the desired Ansible inventory file
             try:
                 with open(self.hfile, 'w') as hosts:
-                    hosts.write(f'# Ansible inventory generated on {fdate}.\n')
+                    hosts.write(f'# Ansible hosts file for Foreman inventory '
+                                f'id {environment_id} generated on {fdate}\n')
                     for key in results_dict:
                         hosts.write(f'\n[{key}]\n')
                         for val in results_dict[key]:
                             hosts.write(f'{val}\n')
-                print(f'The following inventory file has been generated: {self.hfile}')
+                print(f'The following inventory file has been generated '
+                      f'locally: {self.hfile}')
             except IOError:
-                print(f'Error opening the target file: {self.hfile}, please check.')
+                print(f'Error opening the target file: {self.hfile}, please '
+                      f'check.')
 
-        # catch possible requests exceptions
+                # catch possible requests exceptions
         except requests.exceptions.HTTPError as errh:
             print(f'HTTP error: {errh}')
         except requests.exceptions.ConnectionError as errc:

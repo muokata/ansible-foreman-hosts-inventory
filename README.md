@@ -66,7 +66,7 @@ Each host group in selected Foreman environment is represented in the file below
 ```
 
 ```
-# Ansible inventory generated on 03/2/2021 17:19:39
+# Ansible hosts file for Foreman inventory id 1 generated on 07/05/2021 17:50:21
 
 [production/Web]
 webserver01.domain.a
