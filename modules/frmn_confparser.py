@@ -24,8 +24,8 @@ which will be taken (using the main script):
 Fore more detailed information please check the README.md file.
 """
 
-# TODO: implement color prints (colorama module)
-# TODO: log errors in logfile (logging module)
+# TODO: implement color prints (use 'colorama')
+# TODO: log errors to logfile alongside with printing to stdout (use 'logging')
 
 __author__ = 'Petyo Kunchev'
 __version__ = '2.0.3'

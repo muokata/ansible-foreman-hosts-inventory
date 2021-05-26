@@ -15,7 +15,22 @@ using the parsed data and specific Ansible hosts file format.
  - modules/frmn_envparser.py - Initiate API calls to the Foreman API endpoint(s) and parse/generate the data
  - config/foreman.ini - API connection details (API endpoint URL, API user, API password, output file name)
 
-# Example usage on Mac or Linux operating systems
+# Configuration file
+The **foreman.ini** configuration file is located at <PROJECT_ROOT>/config/foreman.ini, it consists of the following details
+ - section **[foreman]** with the following information required
+```
+base_url = https://foreman.example.test/api/v2/environments/
+username = adminusername
+password = adminpassword
+hfile = foreman_inventory_envid_
+```
+
+ - **base_url** - the Foreman API endpoint which the script will connect to and parse data from
+ - **username** - the API user for the connection (make sure to provide sufficient read rights, user is created in Foreman)
+ - **password** - the password for the API user
+ - **hfile** - prefix of the name of the output file which will be generated (*foreman_inventory_envid_* the parsed environment id will be appended to the prefix provided, example: *foreman_inventory_envid_2*)
+
+# Example usage on Linux os macOS operating systems
 ```
 # navigate to the project folder
 cd </path/to/project>

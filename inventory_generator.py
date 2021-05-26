@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+This file contains the following functions:
+    * generate_ansible_hosts - parses the Foreman API and generates inventory
+    * main - the main function of the script
+"""
+
 # import the local custom modules required
 import modules.frmn_envparser as fe
 import modules.frmn_confparser as fc
 
-
-# TODO: update README.md with the config sections in config/foreman.ini
 
 def generate_ansible_hosts():
     """

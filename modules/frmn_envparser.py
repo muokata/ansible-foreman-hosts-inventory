@@ -10,8 +10,8 @@ Import in this module in the main script frmn_envparser.py:
 Fore more detailed information check the README.md file.
 """
 
-# TODO: implement color prints (colorama module)
-# TODO: log errors instead of printing (logging module)
+# TODO: implement color prints (use 'colorama')
+# TODO: log errors to logfile alongside with printing to stdout (use 'logging')
 
 __author__ = 'Petyo Kunchev'
 __version__ = '2.0.3'
