@@ -25,9 +25,9 @@ The **foreman.ini** configuration file is located at <PROJECT_ROOT>/config/forem
     hfile = foreman_inventory_envid_
     ```
 
- - **base_url** - the Foreman API endpoint which the script will connect to and parse data from (Required value)
+ - **base_url** - the Foreman API endpoint which the script will connect to and parse data from (required value)
  - **username** - the API user for the connection (make sure to provide sufficient read rights, user is created in Foreman, required value)
- - **password** - the password for the API user (Required value)
+ - **password** - the password for the API user (required value)
  - **hfile** - prefix of the name of the output file which will be generated (*foreman_inventory_envid_* the parsed environment id will be appended to the prefix provided, example: *foreman_inventory_envid_2*, required value)
 
 # Example usage on Linux os macOS operating systems
