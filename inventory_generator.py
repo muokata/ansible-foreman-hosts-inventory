@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-This file contains the following functions:
-    * generate_ansible_hosts - parses the Foreman API and generates inventory
-    * main - the main function of the script
-"""
 
-# import the local custom modules required
 import modules.frmn_envparser as fe
 import modules.frmn_confparser as fc
 
@@ -16,10 +10,11 @@ def generate_ansible_hosts():
     """
     Parse the Foreman API: list all environments, generate Ansible
     inventory hosts file with groups containing hosts for the desired
-    environment. The environment id is provided as a script argument.
+    environment. The environment ID must provided as an argument to
+    the script when running it.
 
     Call the appropriate methods from the imported modules, based on the
-    input parameters provided to the script.
+    input parameters provided to the script as arguments.
 
     Output is stored locally in file, specified in the configuration.
     """
