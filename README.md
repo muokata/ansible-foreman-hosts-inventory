@@ -1,5 +1,7 @@
 # ansible-foreman-hosts-inventory
-Query the Foreman API and parse all host groups in the desired
+Automatically create Ansible hosts inventory based on Foreman hostgroups and servers by querying the Foreman API and parsing the data.
+
+Query the Foreman API using desired input paramteters for Foreman host group and evironment to be parsed and parse all host groups in the desired
 environment with their host members, generate Ansible inventory file
 using the parsed data and specific Ansible hosts file format.
 
