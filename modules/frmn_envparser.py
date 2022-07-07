@@ -52,7 +52,7 @@ class AnsibleInventory(object):
 
     def __init__(self, envid, base_url, username, password, hostfile):
         """
-        Inits the AnsibleInventory class.
+        Initializes the AnsibleInventory class.
 
         Args:
             envid: The Foreman environment ID parsed from args
