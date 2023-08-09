@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 
-"""
-Initiate API calls to the Foreman API endpoint(s) and parse the
-environments and the hosts groups with hosts for desired environment.
+"""Initiate API calls to the Foreman API endpoint(s) and parse the environments and the hosts groups with hosts for
+desired environment.
 
-Import in this module in the main script frmn_envparser.py:
-    import modules.frmn_envparser as fe
-
+Import in this module in the main script frmn_envparser.py: import modules.frmn_envparser as fe
 Fore more detailed information check the README.md file.
 """
 
@@ -37,17 +34,13 @@ class AnsibleInventory(object):
     """
     AnsibleInventory hosts file generation class.
 
-    This class is used to represent generation of Ansible inventory
-    hosts file by using Foreman API requests. The hosts written to
-    the inventory file must already be members of any Foreman host group
-    and environment.
+    This class is used to represent generation of Ansible inventory hosts file by using Foreman API requests. The
+    hosts written to the inventory file must already be members of any Foreman host group and environment.
 
     Methods
     -------
-    parse_envs()
-        Parse the Foreman API and print the environments configured
-    parse_hosts(environment_id: str = None)
-        Parse the Foreman API per env and generate Ansible hosts file
+    parse_envs() - Parse the Foreman API and print the environments configured
+    parse_hosts(environment_id: str = None) - Parse the Foreman API per env and generate Ansible hosts file
     """
 
     def __init__(self, envid, base_url, username, password, hostfile):
@@ -112,13 +105,11 @@ class AnsibleInventory(object):
 
     def parse_hosts(self, environment_id: str = None):
         """
-        Parse the Foreman API per provided environment and generate the
-        Ansible inventory hosts file. The file is saved locally in the
-        current user's home folder.
+        Parse the Foreman API per provided environment and generate the Ansible inventory hosts file. The file is
+        saved locally in the current user's home folder.
 
-        When ran against a specific foreman environment ID, this script
-        generates Ansible hosts file, based on the obtained from Foreman
-        data, containing host groups and adjacent hosts.
+        When ran against a specific foreman environment ID, this script generates Ansible hosts file, based on the
+        obtained from Foreman data, containing host groups and adjacent hosts.
 
         Parameters
         ----------

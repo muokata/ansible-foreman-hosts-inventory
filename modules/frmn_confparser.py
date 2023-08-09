@@ -3,23 +3,18 @@
 """
 Parse required settings in order proper API requests to be initiated.
 
-Import this module in the main script main.py:
-    import modules.frmn_configparser as fc
+Import this module in the main script main.py: import modules.frmn_configparser as fc
 
-This module is used to parse the ini configuration file for all required
-data for initiating a connection to the Foreman API endpoint, as well as
-the arguments provided to the main script which represent the action
-which will be taken (using the main script):
+This module is used to parse the ini configuration file for all required data for initiating a connection to the
+Foreman API endpoint, as well as the arguments provided to the main script which represent the action which will be
+taken (using the main script):
 
-    - API request for parsing the Foreman environments - Names and IDs:
-        python3 main.py --action listenvs
+    - API request for parsing the Foreman environments - Names and IDs: python3 main.py --action listenvs
 
-    - API request for parsing the host groups and hosts for each group
-        for any given environment ID:
-        python3 main.py --action parseenv -environment 2
+    - API request for parsing the host groups and hosts for each group for any given environment ID: python3 main.py
+    --action parseenv -environment 2
 
-    - Display help message (usage):
-        python3 main.py [--help | -h]
+    - Display help message (usage): python3 main.py [--help | -h]
 
 Fore more detailed information please check the README.md file.
 """
@@ -41,14 +36,12 @@ import configparser
 
 def print_os_warning():
     """
-    Get the operating system family of the host where this program is
-    running (Linux, Windows, macOS).
+    Get the operating system family of the host where this program is running (Linux, Windows, macOS).
 
     Compare with list of supported operating system.
 
-    If the system is not in the supported platforms list, a warning
-    message is displayed, stating that the generated inventory file
-    must be transferred and used on a system which supports Ansible.
+    If the system is not in the supported platforms list, a warning message is displayed, stating that the generated
+    inventory file must be transferred and used on a system which supports Ansible.
     """
     os_family: str = sm().lower()
     supported_platforms: list = ['linux', 'darwin']
@@ -63,8 +56,7 @@ def read_settings() -> dict:
     """
     Read the settings from the foreman.ini external configuration file.
 
-    The following parameters with correct values are required to be
-    present in the config/foreman.ini file:
+    The following parameters with correct values are required to be present in the config/foreman.ini file:
     base_url: the Foreman base url
     username: the Foreman user with sufficient privileges
     password: the password for the user
@@ -74,12 +66,10 @@ def read_settings() -> dict:
     :return: settings - parsed data from the supplied 'foreman.ini' file
     """
     config = configparser.ConfigParser()
-    confdir: str = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                                '..', 'config'))
+    confdir: str = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config'))
     foreman_default_ini_path: str = os.path.join(confdir, 'foreman.ini')
     print(f'Reading Foreman configuration from: {foreman_default_ini_path}')
-    foreman_ini_path: str = os.environ.get('FOREMAN_INI_PATH',
-                                           foreman_default_ini_path)
+    foreman_ini_path: str = os.environ.get('FOREMAN_INI_PATH', foreman_default_ini_path)
 
     config.read(foreman_ini_path)
 
@@ -111,10 +101,9 @@ def parse_args() -> object:
     :return: args - the provided script arguments
     """
     # crete parser object
-    parser = argparse.ArgumentParser(
-        prog='Foreman Ansible Hosts Inventory Parser/Generator',
-        description='Parse Foreman API environments and hosts per environment',
-        epilog='Enjoy!')
+    parser = argparse.ArgumentParser(prog='Foreman Ansible Hosts Inventory Parser/Generator',
+                                     description='Parse Foreman API environments and hosts per environment',
+                                     epilog='Enjoy!')
 
     # add argument for the main action which will be taken
     parser.add_argument('--action', '-a', metavar='<action>',
@@ -133,7 +122,7 @@ def parse_args() -> object:
                         help='Specifies the Foreman environment ID which '
                              'will be parsed, example: 1, the number matches '
                              'the environment name from the list.')
-    
+
     args = parser.parse_args()
 
     return args
