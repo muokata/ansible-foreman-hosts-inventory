@@ -1,5 +1,5 @@
 # ansible-foreman-hosts-inventory
-Automatically create Ansible hosts inventory based on Foreman hostgroups and servers by querying the Foreman API and parsing the data.
+Generate Ansible hosts inventory file based on Foreman hostgroups and servers by querying the Foreman API and parsing the data.
 
 Query the Foreman API using desired input paramteters for Foreman host group and evironment to be parsed and parse all host groups in the desired
 environment with their host members, generate Ansible inventory file
@@ -24,7 +24,7 @@ The **foreman.ini** configuration file is located at <PROJECT_ROOT>/config/forem
     base_url = https://foreman.example.test/api/v2/environments/
     username = adminusername
     password = adminpassword
-    hfile = foreman_inventory_envid_
+    hfile = foreman_inventory_<envid>
     ```
 
  - **base_url** - the Foreman API endpoint which the script will connect to and parse data from (required value)
@@ -116,7 +116,7 @@ two-backup.example.com
 three-backup.example.com
 ```
 
-This inventory file can be passed to Ansible and be to be used as a hosts file
+The generated inventory file can be used by Ansible as a hosts file
 ```
 Use Ansible 'raw' module to execute the 'uptime' command on all servers in the 'test/DB' hostgroup
 ansible -m raw -a "uptime" -i /path/to/foreman_inventory test/DB
