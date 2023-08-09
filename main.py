@@ -8,23 +8,18 @@ import modules.frmn_confparser as fc
 
 def generate_ansible_hosts():
     """
-    Parse the Foreman API: list all environments, generate Ansible
-    inventory hosts file with groups containing hosts for the desired
-    environment. The environment ID must provided as an argument to
-    the script when running it.
+    Parse the Foreman API: list all environments, generate Ansible inventory hosts file with groups containing hosts
+    for the desired environment. The environment ID must be provided as an argument to the script when running it.
 
-    Call the appropriate methods from the imported modules, based on the
-    input parameters provided to the script as arguments.
+    Call the appropriate methods from the imported modules, based on the input parameters provided to the script as
+    arguments.
 
     Output is stored locally in file, specified in the configuration.
     """
     settings = fc.read_settings()
     arguments = fc.parse_args()
     envid = str(arguments.environment)  # get the parsed env id as str
-    hosts = fe.AnsibleInventory(envid,
-                                settings['base_url'],
-                                settings['username'],
-                                settings['password'],
+    hosts = fe.AnsibleInventory(envid, settings['base_url'], settings['username'], settings['password'],
                                 settings['hfile'])
 
     # if action is 'listenvs', call fp.parse_envs() method
@@ -37,10 +32,8 @@ def generate_ansible_hosts():
             fc.print_os_warning()
             hosts.parse_hosts(envid)
         else:
-            exit('Please provide (correct) Foreman environment ID. List all '
-                 'environments supplying the <-a listenvs | --action '
-                 'listenvs> argument to the script, or display full help '
-                 'message <-h | --help>')
+            exit('Please provide (correct) Foreman environment ID. List all environments supplying the <-a listenvs | '
+                 '--action' 'listenvs> argument to the script, or display full help message <-h | --help>')
 
 
 def main():

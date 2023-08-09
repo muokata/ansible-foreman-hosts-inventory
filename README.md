@@ -1,7 +1,7 @@
 # ansible-foreman-hosts-inventory
 Generate Ansible hosts inventory file based on Foreman hostgroups and servers by querying the Foreman API and parsing the data.
 
-Query the Foreman API using desired input paramteters for Foreman host group and evironment to be parsed and parse all host groups in the desired
+Query the Foreman API using desired input parameters for Foreman host group and environment to be parsed and parse all host groups in the desired
 environment with their host members, generate Ansible inventory file
 using the parsed data and specific Ansible hosts file format.
 
@@ -38,19 +38,19 @@ The **foreman.ini** configuration file is located at <PROJECT_ROOT>/config/forem
 cd </path/to/project>
 
 # display help
-python3 inventory_generator.py [-h | --help]
+python3 main.py [-h | --help]
 
 # make sure that file is executable if calling without 'python3'
-./inventory_generator.py -h
-./inventory_generator.py --help
+./main.py -h
+./main.py --help
 
 # list foreman environments with respective IDs
-python3 inventory_generator.py --action listenvs
-python3 inventory_generator.py -a listenvs
+python3 main.py --action listenvs
+python3 main.py -a listenvs
 
 # parse selected foreman environment and generate ansible hosts file
-python3 inventory_generator.py --action parseenv 1
-python3 inventory_generator.py -a parseenv 1
+python3 main.py --action parseenv 1
+python3 main.py -a parseenv 1
 ```
 
 # Example usage on Windows operating systems
@@ -59,16 +59,16 @@ python3 inventory_generator.py -a parseenv 1
 cd <project>
 
 # display help
-python inventory_generator.py [-h | --help]
-python inventory_generator.py [-h | --help]
+python main.py [-h | --help]
+python main.py [-h | --help]
 
 # list foreman environments with respective IDs
-python inventory_generator.py --action listenvs
-python inventory_generator.py -a listenvs
+python main.py --action listenvs
+python main.py -a listenvs
 
 # parse selected foreman environment and generate ansible hosts file
-python inventory_generator.py --action parseenv 1
-python inventory_generator.py -a parseenv 1
+python main.py --action parseenv 1
+python main.py -a parseenv 1
 ```
 
 # Sample file generated
@@ -129,4 +129,4 @@ ansible -m raw -a "hostname -s" /path/to/foreman_inventory mailservers:backupser
 Any other Ansible module can be used as well as playbook or role, all you need to do is point the path to the 'foreman_hosts' file and specify the desired host group(s), or simply set 'all' to run on all host groups in the file
 
 # Plans for future development
-- Run this as a containterized application
+- Run this as a containerized application

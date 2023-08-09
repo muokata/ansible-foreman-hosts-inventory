@@ -3,7 +3,7 @@
 """
 Parse required settings in order proper API requests to be initiated.
 
-Import this module in the main script inventory_generator.py:
+Import this module in the main script main.py:
     import modules.frmn_configparser as fc
 
 This module is used to parse the ini configuration file for all required
@@ -12,14 +12,14 @@ the arguments provided to the main script which represent the action
 which will be taken (using the main script):
 
     - API request for parsing the Foreman environments - Names and IDs:
-        python3 inventory_generator.py --action listenvs
+        python3 main.py --action listenvs
 
     - API request for parsing the host groups and hosts for each group
         for any given environment ID:
-        python3 inventory_generator.py --action parseenv -environment 2
+        python3 main.py --action parseenv -environment 2
 
     - Display help message (usage):
-        python3 inventory_generator.py [--help | -h]
+        python3 main.py [--help | -h]
 
 Fore more detailed information please check the README.md file.
 """
@@ -28,7 +28,7 @@ Fore more detailed information please check the README.md file.
 # TODO: log errors to logfile alongside with printing to stdout (use 'logging')
 
 __author__ = 'Petyo Kunchev'
-__version__ = '2.0.3'
+__version__ = '2.0.4'
 __maintainer__ = 'Petyo Kunchev'
 __license__ = 'MIT'
 
@@ -42,7 +42,7 @@ import configparser
 def print_os_warning():
     """
     Get the operating system family of the host where this program is
-    running (Linux, Windows, MacOS).
+    running (Linux, Windows, macOS).
 
     Compare with list of supported operating system.
 
@@ -104,7 +104,7 @@ def parse_args() -> object:
     Parse the script arguments - based on the argparse Python module.
 
     To list all Foreman environments: '[-a | --action] listenvs'
-    To parse a desired Foreman environment: '[-a | --action] parseenv -e
+    To parse a desired Foreman environment: '[-a | --action] parseenv -e'
     <envid>
 
     :rtype: object
