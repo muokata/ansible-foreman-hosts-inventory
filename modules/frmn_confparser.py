@@ -1,128 +1,108 @@
 # -*- coding: utf-8 -*-
 
 """
-Parse required settings in order proper API requests to be initiated.
+Module to parse required settings for initiating proper API requests.
 
-Import this module in the main script main.py: import modules.frmn_configparser as fc
+Usage:
+- Import this module in the main script: `import modules.frmn_configparser as fc`.
 
-This module is used to parse the ini configuration file for all required data for initiating a connection to the
-Foreman API endpoint, as well as the arguments provided to the main script which represent the action which will be
-taken (using the main script):
+Commands:
+    - List Foreman environments: `python3 main.py --action listenvs`
+    - Parse host groups/hosts for an environment ID: 
+      `python3 main.py --action parseenv --environment 2`
+    - Display help: `python3 main.py [--help | -h]`
 
-    - API request for parsing the Foreman environments - Names and IDs: python3 main.py --action listenvs
-
-    - API request for parsing the host groups and hosts for each group for any given environment ID: python3 main.py
-    --action parseenv -environment 2
-
-    - Display help message (usage): python3 main.py [--help | -h]
-
-Fore more detailed information please check the README.md file.
+For detailed information, refer to the README.md file.
 """
-
-# TODO: implement color prints (use 'colorama')
-# TODO: log errors to logfile alongside with printing to stdout (use 'logging')
-
-__author__ = 'Petyo Kunchev'
-__version__ = '2.0.4'
-__maintainer__ = 'Petyo Kunchev'
-__license__ = 'MIT'
 
 import os
 import argparse
+import configparser
 from platform import system as sm
 
-import configparser
+__author__ = 'Petyo Kunchev'
+__version__ = '2.0.5'
+__maintainer__ = 'Petyo Kunchev'
+__license__ = 'MIT'
+
+# TODO: Add color prints (using `colorama`).
+# TODO: Log errors to a file and stdout (using `logging`).
 
 
 def print_os_warning():
     """
-    Get the operating system family of the host where this program is running (Linux, Windows, macOS).
-
-    Compare with list of supported operating system.
-
-    If the system is not in the supported platforms list, a warning message is displayed, stating that the generated
-    inventory file must be transferred and used on a system which supports Ansible.
+    Display a warning if the OS is unsupported for Ansible inventory use.
     """
-    os_family: str = sm().lower()
-    supported_platforms: list = ['linux', 'darwin']
+    os_family = sm().lower()
+    supported_platforms = ['linux', 'darwin']
 
     if os_family not in supported_platforms:
-        print(f'Running {os_family.upper()} OS, make sure to transfer the '
-              f'generated '
-              f'inventory file to a system which supports Ansible.')
+        print(
+            f'Warning: Running on {os_family.upper()} OS. Transfer the '
+            'generated inventory file to a system that supports Ansible.'
+        )
 
 
 def read_settings() -> dict:
     """
-    Read the settings from the foreman.ini external configuration file.
+    Parse settings from the `foreman.ini` configuration file.
 
-    The following parameters with correct values are required to be present in the config/foreman.ini file:
-    base_url: the Foreman base url
-    username: the Foreman user with sufficient privileges
-    password: the password for the user
-    hfile: the name of the Ansible inventory file which will be created
-
-    :rtype: dict
-    :return: settings - parsed data from the supplied 'foreman.ini' file
+    Returns:
+        dict: Configuration parameters (base_url, username, password, hfile).
     """
     config = configparser.ConfigParser()
-    confdir: str = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config'))
-    foreman_default_ini_path: str = os.path.join(confdir, 'foreman.ini')
-    print(f'Reading Foreman configuration from: {foreman_default_ini_path}')
-    foreman_ini_path: str = os.environ.get('FOREMAN_INI_PATH', foreman_default_ini_path)
+    confdir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config'))
+    default_ini_path = os.path.join(confdir, 'foreman.ini')
+    print(f'Reading Foreman configuration from: {default_ini_path}')
 
+    foreman_ini_path = os.environ.get('FOREMAN_INI_PATH', default_ini_path)
     config.read(foreman_ini_path)
 
-    settings: dict = {}
-    required: list = ['base_url', 'username', 'password', 'hfile']
-    missing: list = []
+    required = ['base_url', 'username', 'password', 'hfile']
+    settings = {}
+    missing = []
 
-    setting: str
-    for setting in required:
-        value = config.get('foreman', setting)
-        if value is None:
-            missing.append(setting)
-        settings[setting] = value
+    for key in required:
+        value = config.get('foreman', key, fallback=None)
+        if not value:
+            missing.append(key)
+        settings[key] = value
+
     if missing:
-        exit('No values, please check your ini configuration file contents!')
+        raise ValueError(
+            f'Missing required configuration keys in `foreman.ini`: {", ".join(missing)}'
+        )
 
     return settings
 
 
-def parse_args() -> object:
+def parse_args() -> argparse.Namespace:
     """
-    Parse the script arguments - based on the argparse Python module.
+    Parse command-line arguments for the script.
 
-    To list all Foreman environments: '[-a | --action] listenvs'
-    To parse a desired Foreman environment: '[-a | --action] parseenv -e'
-    <envid>
-
-    :rtype: object
-    :return: args - the provided script arguments
+    Returns:
+        argparse.Namespace: Parsed arguments (action, environment).
     """
-    # crete parser object
-    parser = argparse.ArgumentParser(prog='Foreman Ansible Hosts Inventory Parser/Generator',
-                                     description='Parse Foreman API environments and hosts per environment',
-                                     epilog='Enjoy!')
+    parser = argparse.ArgumentParser(
+        prog='Foreman Ansible Hosts Inventory Parser/Generator',
+        description='Parse Foreman API environments and hosts per environment',
+        epilog='Enjoy!'
+    )
 
-    # add argument for the main action which will be taken
-    parser.add_argument('--action', '-a', metavar='<action>',
-                        choices=['listenvs', 'parseenv'],
-                        action='store', dest="action", default="listenvs",
-                        help='[listenvs, parseenv] - the action that will be '
-                             'taken. "listenvs" will list all Foreman '
-                             'environments with respective IDs. "parseenv" '
-                             'will parse the selected/supplied environment ID '
-                             'and generate proper Ansible inventory file.')
+    parser.add_argument(
+        '-a', '--action',
+        metavar='<action>',
+        choices=['listenvs', 'parseenv'],
+        default='listenvs',
+        help='Specify the action: "listenvs" lists all Foreman environments. '
+             '"parseenv" parses the supplied environment ID and generates an '
+             'Ansible inventory file.'
+    )
 
-    # add argument for supplying the desired environment ID for parsing
-    parser.add_argument('--environment', '-e', metavar='<environment>',
-                        action='store',
-                        dest="environment",
-                        help='Specifies the Foreman environment ID which '
-                             'will be parsed, example: 1, the number matches '
-                             'the environment name from the list.')
+    parser.add_argument(
+        '-e', '--environment',
+        metavar='<environment>',
+        help='Provide the Foreman environment ID to parse. Example: 1.'
+    )
 
-    args = parser.parse_args()
-
-    return args
+    return parser.parse_args()
