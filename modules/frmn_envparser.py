@@ -1,46 +1,45 @@
 # -*- coding: utf-8 -*-
 
-"""Initiate API calls to the Foreman API endpoint(s) and parse the environments and the hosts groups with hosts for
-desired environment.
+"""
+Initiate API calls to the Foreman API endpoint(s) and parse the environments and the host groups 
+with hosts for the desired environment.
 
 Import in this module in the main script frmn_envparser.py: import modules.frmn_envparser as fe
-Fore more detailed information check the README.md file.
+For more detailed information check the README.md file.
 """
 
 # TODO: implement color prints (use 'colorama')
 # TODO: log errors to logfile alongside with printing to stdout (use 'logging')
 
-__author__ = 'Petyo Kunchev'
-__version__ = '2.0.3'
-__maintainer__ = 'Petyo Kunchev'
-__license__ = 'MIT'
+__author__ = "Petyo Kunchev"
+__version__ = "2.0.4"
+__maintainer__ = "Petyo Kunchev"
+__license__ = "MIT"
 
 import os
 from pathlib import Path
 from typing import Any
 from datetime import datetime
-
 import json
 import urllib3
 import requests
 from requests.models import Response
 from collections import defaultdict
 
-# suppress warnings for self-signed SSL Foreman certificates (if used)
+# Suppress warnings for self-signed SSL Foreman certificates (if used)
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-class AnsibleInventory(object):
+class AnsibleInventory:
     """
     AnsibleInventory hosts file generation class.
 
     This class is used to represent generation of Ansible inventory hosts file by using Foreman API requests. The
     hosts written to the inventory file must already be members of any Foreman host group and environment.
 
-    Methods
-    -------
-    parse_envs() - Parse the Foreman API and print the environments configured
-    parse_hosts(environment_id: str = None) - Parse the Foreman API per env and generate Ansible hosts file
+    Methods:
+        parse_envs() - Parse the Foreman API and print the environments configured
+        parse_hosts(environment_id: str = None) - Parse the Foreman API per env and generate Ansible hosts file
     """
 
     def __init__(self, envid, base_url, username, password, hostfile):
@@ -65,112 +64,89 @@ class AnsibleInventory(object):
         Parse the Foreman API, collect and print to the console data for
         the available and configured environments: env name and env ID.
         """
-        # API parse related - Foreman environments, timeout is set to 5
         try:
-            r: Response = requests.get(self.base_url, verify=False, timeout=5,
-                                       auth=(self.username, self.password))
-            r.raise_for_status()
-            print(f'API request status code: {r.status_code}')
-            response: str = r.text
-            env_data: dict = json.loads(response)
-            data: dict = env_data['results']  # get data from the results key
-            parsed_envs: list = []  # define list to append env names to
-            parsed_env_ids: list = []  # define list to append env IDs to
+            response: Response = requests.get(
+                self.base_url, verify=False, timeout=5, auth=(self.username, self.password)
+            )
+            response.raise_for_status()
+            print(f"API request status code: {response.status_code}")
+            env_data: dict = response.json()
+            data: dict = env_data["results"]
+            parsed_envs, parsed_env_ids = [], []
             results_dict: defaultdict[Any, list] = defaultdict(list)
 
-            # append env names and env IDs to their respective lists
-            for data in data:
-                env_name: object = data['name']  # filter environment name
-                env_id: object = data['id']  # get environment ID
-                parsed_envs.append(env_name)
-                parsed_env_ids.append(env_id)
+            for datum in data:
+                parsed_envs.append(datum["name"])
+                parsed_env_ids.append(datum["id"])
 
-            # zip the two lists into single defaultdict
-            for ename, eid in zip(parsed_envs, parsed_env_ids):
-                results_dict[ename].append(eid)
+            for env_name, env_id in zip(parsed_envs, parsed_env_ids):
+                results_dict[env_name].append(env_id)
 
-            # print the results for the selected environment
-            print('-All Foreman environments and their respective IDs-')
-            [print(f'{n:<15} {i}') for n, i in results_dict.items()]
+            print("-All Foreman environments and their respective IDs-")
+            [print(f"{name:<15} {ids}") for name, ids in results_dict.items()]
 
-        # catch possible requests exceptions
-        except requests.exceptions.HTTPError as errh:
-            print(f'HTTP error: {errh}')
-        except requests.exceptions.ConnectionError as errc:
-            print(f'Connection error: {errc}')
-        except requests.exceptions.Timeout as errt:
-            print(f'Timeout error: {errt}')
-        except requests.exceptions.RequestException as errr:
-            print(f'General error: {errr}')
+        except requests.exceptions.HTTPError as http_err:
+            print(f"HTTP error: {http_err}")
+        except requests.exceptions.ConnectionError as conn_err:
+            print(f"Connection error: {conn_err}")
+        except requests.exceptions.Timeout as timeout_err:
+            print(f"Timeout error: {timeout_err}")
+        except requests.exceptions.RequestException as req_err:
+            print(f"General error: {req_err}")
 
     def parse_hosts(self, environment_id: str = None):
         """
         Parse the Foreman API per provided environment and generate the Ansible inventory hosts file. The file is
         saved locally in the current user's home folder.
 
-        When ran against a specific foreman environment ID, this script generates Ansible hosts file, based on the
-        obtained from Foreman data, containing host groups and adjacent hosts.
-
-        Parameters
-        ----------
-        environment_id (str): Foreman environment ID provided as arg
+        Parameters:
+            environment_id (str): Foreman environment ID provided as arg
         """
-        # construct the Foreman API URL for the selected environment -
-        # results are limited up to 100000, change accordingly
-        url: str = f'{self.base_url + environment_id}/hosts?per_page=100000'
-        print('Starting hosts file generation, please wait...')
+        url: str = f"{self.base_url}{environment_id}/hosts?per_page=100000"
+        print("Starting hosts file generation, please wait...")
 
-        # generate time stamp for the hosts file header comments
         now: datetime = datetime.now()
-        fdate: str = now.strftime('%d/%m/%Y %H:%M:%S')
+        timestamp: str = now.strftime("%d/%m/%Y %H:%M:%S")
 
-        print(f'Parsing Foreman environment with id: [{environment_id}]')
+        print(f"Parsing Foreman environment with id: [{environment_id}]")
 
-        # API parse related - Foreman hosts, timeout is set to 5
         try:
-            r: Response = requests.get(url, verify=False, timeout=5,
-                                       auth=(self.username, self.password))
-            r.raise_for_status()
-            print(f'API request status code: {r.status_code}')
-            response: str = r.text
-            foreman_data: dict = json.loads(response)
-            data = foreman_data['results']  # get data from the results key
-            parsed_groups: list = []  # define list to append groups to
-            parsed_hosts: list = []  # define list to append hosts to
+            response: Response = requests.get(
+                url, verify=False, timeout=5, auth=(self.username, self.password)
+            )
+            response.raise_for_status()
+            print(f"API request status code: {response.status_code}")
+            foreman_data: dict = response.json()
+            data = foreman_data["results"]
+            parsed_groups, parsed_hosts = [], []
             results_dict: defaultdict[Any, list] = defaultdict(list)
 
-            # append groups and hosts to their respective lists
-            for data in data:
-                host_group: object = data['hostgroup_title']  # host groups
-                name: object = data['name']  # servers in each host group
-                parsed_groups.append(host_group)
-                parsed_hosts.append(name)
+            for datum in data:
+                parsed_groups.append(datum["hostgroup_title"])
+                parsed_hosts.append(datum["name"])
 
-            # zip the two lists into single defaultdict
             for group, host in zip(parsed_groups, parsed_hosts):
                 results_dict[group].append(host)
 
-            # write the results to the desired Ansible inventory file
             try:
-                with open(self.hfile, 'w') as hosts:
-                    hosts.write(f'# Ansible hosts file for Foreman inventory '
-                                f'id {environment_id} generated on {fdate}\n')
-                    for key in results_dict:
-                        hosts.write(f'\n[{key}]\n')
-                        for val in results_dict[key]:
-                            hosts.write(f'{val}\n')
-                print(f'The following inventory file has been generated '
-                      f'locally: {self.hfile}')
+                with open(self.hfile, "w") as hosts:
+                    hosts.write(
+                        f"# Ansible hosts file for Foreman inventory id {environment_id} "
+                        f"generated on {timestamp}\n"
+                    )
+                    for key, values in results_dict.items():
+                        hosts.write(f"\n[{key}]\n")
+                        for value in values:
+                            hosts.write(f"{value}\n")
+                print(f"The following inventory file has been generated locally: {self.hfile}")
             except IOError:
-                print(f'Error opening the target file: {self.hfile}, please '
-                      f'check.')
+                print(f"Error opening the target file: {self.hfile}, please check.")
 
-        # catch possible requests exceptions
-        except requests.exceptions.HTTPError as errh:
-            print(f'HTTP error: {errh}')
-        except requests.exceptions.ConnectionError as errc:
-            print(f'Connection error: {errc}')
-        except requests.exceptions.Timeout as errt:
-            print(f'Timeout error: {errt}')
-        except requests.exceptions.RequestException as errr:
-            print(f'General error: {errr}')
+        except requests.exceptions.HTTPError as http_err:
+            print(f"HTTP error: {http_err}")
+        except requests.exceptions.ConnectionError as conn_err:
+            print(f"Connection error: {conn_err}")
+        except requests.exceptions.Timeout as timeout_err:
+            print(f"Timeout error: {timeout_err}")
+        except requests.exceptions.RequestException as req_err:
+            print(f"General error: {req_err}")
