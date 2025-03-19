@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 
 import modules.frmn_envparser as fe
 import modules.frmn_confparser as fc
@@ -8,35 +6,49 @@ import modules.frmn_confparser as fc
 
 def generate_ansible_hosts():
     """
-    Parse the Foreman API: list all environments, generate Ansible inventory hosts file with groups containing hosts
-    for the desired environment. The environment ID must be provided as an argument to the script when running it.
+    Parse the Foreman API to list all environments and generate an Ansible inventory 
+    hosts file with groups containing hosts for the desired environment. 
+    The environment ID must be provided as an argument when running the script.
 
-    Call the appropriate methods from the imported modules, based on the input parameters provided to the script as
-    arguments.
-
-    Output is stored locally in file, specified in the configuration.
+    This function utilizes methods from the imported modules based on the script's 
+    input parameters. The resulting output is saved locally in the file specified 
+    in the configuration.
     """
+    # Load settings and parse command-line arguments
     settings = fc.read_settings()
     arguments = fc.parse_args()
-    envid = str(arguments.environment)  # get the parsed env id as str
-    hosts = fe.AnsibleInventory(envid, settings['base_url'], settings['username'], settings['password'],
-                                settings['hfile'])
+    env_id = str(arguments.environment)
 
-    # if action is 'listenvs', call fp.parse_envs() method
+    # Initialize the AnsibleInventory with required parameters
+    hosts = fe.AnsibleInventory(
+        env_id,
+        settings['base_url'],
+        settings['username'],
+        settings['password'],
+        settings['hfile']
+    )
+
     if arguments.action == 'listenvs':
+        # List all environments
         hosts.parse_envs()
-
-    # if action is 'parseenv', call fp.parse_hosts(arg) method
-    if arguments.action == 'parseenv':
+    elif arguments.action == 'parseenv':
+        # Parse environment hosts
         if arguments.environment is not None:
             fc.print_os_warning()
-            hosts.parse_hosts(envid)
+            hosts.parse_hosts(env_id)
         else:
-            exit('Please provide (correct) Foreman environment ID. List all environments supplying the <-a listenvs | '
-                 '--action' 'listenvs> argument to the script, or display full help message <-h | --help>')
+            exit(
+                "Error: Please provide a valid Foreman environment ID. "
+                "You can list all environments using the <-a listenvs | --action listenvs> option, "
+                "or access help using <-h | --help>."
+            )
 
 
 def main():
+    """
+    The main entry point of the script, which triggers the generation 
+    of Ansible hosts.
+    """
     generate_ansible_hosts()
 
 
