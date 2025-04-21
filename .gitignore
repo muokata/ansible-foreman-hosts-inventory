@@ -1,2 +1,4 @@
 venv/
 .idea/
+config/foreman.ini
+modules/__pycache__
